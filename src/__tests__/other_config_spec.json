@@ -1,0 +1,158 @@
+{
+  "dynamic_configs": [
+    {
+      "name": "test_config",
+      "type": "dynamic_config",
+      "salt": "40002d54-616f-4170-bed7-c2ba199daf12",
+      "enabled": true,
+      "defaultValue": {
+        "number": 7,
+        "boolean": true
+      },
+      "rules": [],
+      "isDeviceBased": false,
+      "idType": "userID",
+      "entity": "dynamic_config"
+    }
+  ],
+  "feature_gates": [
+    {
+      "name": "always_on_gate",
+      "type": "feature_gate",
+      "salt": "f550b098-a800-4afd-b68c-2a6a99aa0182",
+      "enabled": true,
+      "defaultValue": false,
+      "rules": [
+        {
+          "name": "1YcrJyzoTPPcCpPIdhsPpd",
+          "groupName": "all",
+          "passPercentage": 100,
+          "conditions": [
+            {
+              "type": "public",
+              "targetValue": null,
+              "operator": null,
+              "field": null,
+              "additionalValues": {},
+              "isDeviceBased": false,
+              "idType": "userID"
+            }
+          ],
+          "returnValue": true,
+          "id": "1YcrJyzoTPPcCpPIdhsPpd",
+          "salt": "e7396648-1297-4a08-bae5-5f7fa3e87f78",
+          "isDeviceBased": false,
+          "idType": "userID"
+        }
+      ],
+      "isDeviceBased": false,
+      "idType": "userID",
+      "entity": "feature_gate"
+    },
+    {
+      "name": "on_for_statsig_email",
+      "type": "feature_gate",
+      "salt": "7e7e93be-0324-4600-be08-a8375034efb3",
+      "enabled": true,
+      "defaultValue": false,
+      "rules": [
+        {
+          "name": "2Gnh3NhB3nrmjMzVqyzkoP",
+          "groupName": "test_holdout",
+          "passPercentage": 0,
+          "conditions": [
+            {
+              "type": "pass_gate",
+              "targetValue": "test_holdout",
+              "operator": "any",
+              "field": null,
+              "additionalValues": null,
+              "isDeviceBased": false,
+              "idType": "userID"
+            }
+          ],
+          "returnValue": true,
+          "id": "2Gnh3NhB3nrmjMzVqyzkoP",
+          "salt": "",
+          "isDeviceBased": false,
+          "idType": "userID"
+        },
+        {
+          "name": "2xBMbP9p6HHEUE3UDdU3C7",
+          "groupName": "statsig emails",
+          "passPercentage": 100,
+          "conditions": [
+            {
+              "type": "user_field",
+              "targetValue": [
+                "@statsig.com"
+              ],
+              "operator": "str_contains_any",
+              "field": "email",
+              "additionalValues": {},
+              "isDeviceBased": false,
+              "idType": "userID"
+            }
+          ],
+          "returnValue": true,
+          "id": "2xBMbP9p6HHEUE3UDdU3C7",
+          "salt": "2e58ec17-904b-4a3e-b31c-e32a0df2e29a",
+          "isDeviceBased": false,
+          "idType": "userID"
+        }
+      ],
+      "isDeviceBased": false,
+      "idType": "userID",
+      "entity": "feature_gate"
+    },
+    {
+      "name": "test_holdout",
+      "type": "feature_gate",
+      "salt": "bab21a79-2a33-45fc-acfd-49cbd7a4bc2a",
+      "enabled": true,
+      "defaultValue": false,
+      "rules": [
+        {
+          "name": "2GxshzLn6Enp9xFz6vQKGD:1.00:1",
+          "groupName": "everyone",
+          "passPercentage": 1,
+          "conditions": [
+            {
+              "type": "public",
+              "targetValue": null,
+              "operator": null,
+              "field": null,
+              "additionalValues": null,
+              "isDeviceBased": false,
+              "idType": "userID"
+            }
+          ],
+          "returnValue": true,
+          "id": "2GxshzLn6Enp9xFz6vQKGD:1.00:1",
+          "salt": "2GxshzLn6Enp9xFz6vQKGD",
+          "isDeviceBased": false,
+          "idType": "userID"
+        }
+      ],
+      "isDeviceBased": false,
+      "idType": "userID",
+      "entity": "holdout"
+    }
+  ],
+  "id_lists": {},
+  "layers": {},
+  "layer_configs": [],
+  "has_updates": true,
+  "time": 1692836436089,
+  "company_id": "1DNqfXfqRzhoA3AgD0vH2F",
+  "diagnostics": {
+    "initialize": 1000,
+    "dcs": 1000,
+    "download_config_specs": 1000,
+    "idlist": 100,
+    "get_id_list": 100,
+    "get_id_list_sources": 100,
+    "log": 100,
+    "log_event": 100
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["es5", "dom", "esnext"],
+    "module": "commonjs",
+    "strict": true,
+    "outDir": "dist",
+    "sourceMap": false,
+    "esModuleInterop": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "types": ["@types/webpack-env", "node", "jest"]
+  },
+  "include": ["src/**/*", "src/utils/*"],
+  "exclude": [
+    "node_modules",
+    "typings",
+    "src/__tests__/*",
+    "src/utils/__tests__/*",
+    "dist",
+    "build",
+    "tsconfig.json"
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "name": "statsig-js-local-eval",
+  "version": "1.0.0",
+  "description": "A slimmed version of the Statsig JavaScript client SDK that evaluates rules locally",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepare": "rm -rf build/ && rm -rf dist/ && genversion src/SDKVersion.ts --es6 && tsc && webpack",
+    "postbuild": "rm -rf build/**/*.map",
+    "test": "jest --config=jest-debug.config.js",
+    "testForGithubOrRedisEnthusiasts": "jest",
+    "test:watch": "jest --watch",
+    "build:dryrun": "npx tsc --noEmit",
+    "types": "npx tsc",
+    "size-check": "./bundle-size-check.js"
+  },
+  "files": [
+    "build/statsig-prod-web-sdk.js",
+    "dist/*.js",
+    "dist/*.d.ts",
+    "dist/utils/*.js",
+    "dist/utils/*.d.ts"
+  ],
+  "jsdelivr": "build/statsig-prod-web-sdk.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/statsig-io/js-local-eval.git"
+  },
+  "author": "Statsig, Inc.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/statsig-io/js-local-eval/issues"
+  },
+  "keywords": [
+    "feature gate",
+    "feature flag",
+    "continuous deployment",
+    "ci",
+    "ab test"
+  ],
+  "homepage": "https://www.statsig.com",
+  "devDependencies": {
+    "@babel/preset-env": "^7.14.9",
+    "@babel/preset-typescript": "^7.14.5",
+    "@types/jest": "^27.1.0",
+    "@types/node": "^18.15.10",
+    "@types/uuid": "^8.3.1",
+    "@types/webpack-env": "^1.18.1",
+    "circular-dependency-plugin": "^5.2.2",
+    "core-js": "^3.16.4",
+    "genversion": "^3.1.1",
+    "jest": "^27.1.0",
+    "terser-webpack-plugin": "^5.1.4",
+    "ts-jest": "^27.1.0",
+    "ts-loader": "^9.2.3",
+    "typescript": "^4.2.2",
+    "uglify-js": "^3.17.4",
+    "webpack": "^5.82.0",
+    "webpack-bundle-analyzer": "^4.8.0",
+    "webpack-cli": "^5.0.2"
+  },
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "style": "module",
+      "parser": "typescript"
+    }
+  },
+  "dependencies": {
+    "js-sha256": "^0.10.1"
+  }
+}
