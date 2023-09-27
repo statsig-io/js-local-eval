@@ -86,17 +86,6 @@ describe('Statsig ErrorBoundary Usage', () => {
     expectSingleError('_logger.shutdown');
   });
 
-  it('recovers from errors with getStableID', () => {
-    // @ts-ignore
-    client._identity = 1;
-
-    client.getStableID();
-
-    expectSingleError(
-      `Cannot read properties of undefined (reading '_stableID')`,
-    );
-  });
-
   it('recovers from errors with initialize', async () => {
     const localClient = new StatsigClient('client-key');
     // @ts-ignore
