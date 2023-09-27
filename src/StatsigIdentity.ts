@@ -6,7 +6,6 @@ import { version as SDKVersion } from './SDKVersion';
 export type StatsigMetadata = {
   sdkType: string;
   sdkVersion: string;
-  stableID: string;
   locale?: string;
   appVersion?: string;
   systemVersion?: string;
@@ -18,6 +17,7 @@ export type StatsigMetadata = {
 export default class Identity {
   readonly _sdkKey: string;
   readonly _statsigMetadata: StatsigMetadata;
+  readonly _stableID: string;
 
   private _sdkType = 'js-local-eval';
 
@@ -33,18 +33,18 @@ export default class Identity {
       StatsigLocalStorage.getItem(STATSIG_STABLE_ID_KEY) ??
       this._getUUID();
 
+    this._stableID = stableID;
     this._statsigMetadata = {
-      stableID: stableID,
       sdkType: this._sdkType,
       sdkVersion: this._sdkVersion,
     };
   }
 
   public saveStableID(): void {
-    if (this._statsigMetadata.stableID != null) {
+    if (this._stableID != null) {
       StatsigLocalStorage.setItem(
         STATSIG_STABLE_ID_KEY,
-        this._statsigMetadata.stableID,
+        this._stableID,
       );
     }
   }

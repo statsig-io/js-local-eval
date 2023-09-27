@@ -93,7 +93,7 @@ describe('Statsig ErrorBoundary Usage', () => {
     client.getStableID();
 
     expectSingleError(
-      `Cannot read properties of undefined (reading 'stableID')`,
+      `Cannot read properties of undefined (reading '_stableID')`,
     );
   });
 
