@@ -542,7 +542,7 @@ describe('Verify behavior of top level index functions', () => {
   });
 
   test('shutdown does flush logs and they are correct', async () => {
-    expect.assertions(8);
+    expect.assertions(9);
     const user = {
       userID: '12345',
       country: 'US',
@@ -639,9 +639,10 @@ describe('Verify behavior of top level index functions', () => {
       expect.objectContaining({
         sdkType: 'js-local-eval',
         sdkVersion: expect.any(String),
-        stableID: expect.any(String),
       }),
     );
+    // @ts-ignore
+    expect(postedLogs['statsigMetadata'].stableID).toBeUndefined();
   });
 
   test('set and get stableID', async () => {

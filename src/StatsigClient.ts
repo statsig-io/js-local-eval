@@ -8,7 +8,6 @@ import StatsigSDKOptions, { StatsigOptions } from './StatsigSDKOptions';
 import { EvaluationDetails, EvaluationReason } from './EvaluationMetadata';
 import { StatsigUser } from './StatsigUser';
 import StatsigLocalStorage from './utils/StatsigLocalStorage';
-import { now } from './utils/Timing';
 import makeLogEvent from './LogEvent';
 import ConfigEvaluation from './ConfigEvaluation';
 import Evaluator from './Evaluator';
@@ -285,7 +284,7 @@ export default class StatsigClient {
   public getStableID(): string {
     return this._errorBoundary._capture(
       'getStableID',
-      () => this._identity._statsigMetadata.stableID,
+      () => this._identity._stableID,
       () => '',
     );
   }
