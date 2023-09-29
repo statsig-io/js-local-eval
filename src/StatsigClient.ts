@@ -19,7 +19,7 @@ export type CheckGateOptions = {
 
 export type GetExperimentOptions = {
   disableExposureLogging?: boolean;
-  userPersistedValues?: Record<string, unknown>;
+  userPersistedValues?: Record<string, unknown> | null;
 };
 
 export type GetLayerOptions = {
@@ -249,14 +249,33 @@ export default class StatsigClient {
     });
   }
 
+  public loadUserPersistedValues(
+    user: StatsigUser,
+    idType: string,
+  ): Record<string, unknown> | null {
+    return this._errorBoundary._capture('shutdown', () => {
+      if (this._options.userPersistentStorage == null) {
+        console.error("No user persistent storage set.  loadUserPersistedValues will noop");
+        return null;
+      }
+      const persistedValue = StickyValuesStorage.getAll(user, idType);
+      if (persistedValue == null) {
+        return {};
+      }
+      return persistedValue;
+    }, () => {
+      return {};
+    });
+  }
+
   public async loadUserPersistedValuesAsync(
     user: StatsigUser,
     idType: string,
-  ): Promise<Record<string, unknown>> {
+  ): Promise<Record<string, unknown> | null> {
     return this._errorBoundary._capture('shutdown', async () => {
       if (this._options.userPersistentStorage == null) {
         console.error("No user persistent storage set.  loadUserPersistedValuesAsync will noop");
-        return {};
+        return null;
       }
       const asyncValue = await StickyValuesStorage.getAsync(user, idType);
       if (asyncValue == null) {

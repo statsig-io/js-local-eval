@@ -79,11 +79,18 @@ export default class Statsig {
     Statsig.instance?.logExperimentExposure(user, configName);
   }
 
+  public static loadUserPersistedValues(
+    user: StatsigUser,
+    idType: string,
+  ): Record<string, unknown> | null {
+    return Statsig.instance?.loadUserPersistedValues(user, idType) ?? null;
+  }
+
   public static async loadUserPersistedValuesAsync(
     user: StatsigUser,
     idType: string,
-  ): Promise<Record<string, unknown>> {
-    return await Statsig.instance?.loadUserPersistedValuesAsync(user, idType) ?? {};
+  ): Promise<Record<string, unknown> | null> {
+    return await Statsig.instance?.loadUserPersistedValuesAsync(user, idType) ?? null;
   }
   
   // Layer

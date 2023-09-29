@@ -39,14 +39,12 @@ export default class Evaluator {
       );
     }
     let userStickyValues: Record<string, unknown> | null = options?.userPersistedValues ?? null;
-    if (config.isActive) {
-      if (userStickyValues == null) {
-        userStickyValues = StickyValuesStorage.getAll(user, config.idType);
-      }
+    // opt in to sticky by providing the values to the check
+    const applyStickyValues = userStickyValues !== null;
+    if (config.isActive  && applyStickyValues) {
       if (userStickyValues !== null) {
         const stickyConfig: Record<string, unknown> | null = userStickyValues[configName] as Record<string, unknown> ?? null;
         if (stickyConfig != null) {
-          
           const stickyEvaluation = ConfigEvaluation.fromSticky(stickyConfig);
           if (stickyEvaluation !== null) {
             return stickyEvaluation;
@@ -64,7 +62,9 @@ export default class Evaluator {
           userStickyValues = {};
         }
         userStickyValues[configName] = evaluation.getJSONValue();
-        StickyValuesStorage.save(user, config.idType, userStickyValues);
+        if (applyStickyValues) {
+          StickyValuesStorage.save(user, config.idType, userStickyValues);
+        }
       }
     }
     return evaluation;
