@@ -1,6 +1,8 @@
 import ErrorBoundary from './ErrorBoundary';
 import Identity from './StatsigIdentity';
-import StatsigSDKOptions, { DEFAULT_CONFIG_SPEC_API } from './StatsigSDKOptions';
+import StatsigSDKOptions, {
+  DEFAULT_CONFIG_SPEC_API,
+} from './StatsigSDKOptions';
 
 export enum StatsigEndpoint {
   DownloadConfigSpecs = 'download_config_specs',
@@ -105,7 +107,8 @@ export default class StatsigNetwork {
     }
 
     const url = this.getUrl(endpointName);
-    const isDownloadConfigSpecs = endpointName === StatsigEndpoint.DownloadConfigSpecs;
+    const isDownloadConfigSpecs =
+      endpointName === StatsigEndpoint.DownloadConfigSpecs;
     const counter = this.leakyBucket[url];
     if (counter != null && counter >= 30) {
       return Promise.reject(
@@ -124,17 +127,18 @@ export default class StatsigNetwork {
     const statsigMetadata = this._identity._statsigMetadata;
 
     const params: RequestInit = {
-      method: isDownloadConfigSpecs
-        ? 'GET'
-        : 'POST',
+      method: isDownloadConfigSpecs ? 'GET' : 'POST',
       body: body === null ? undefined : JSON.stringify(body),
-      headers: isDownloadConfigSpecs ? {} : {
-        'Content-type': 'application/json; charset=UTF-8',
-        'STATSIG-API-KEY': this._identity._sdkKey,
-        'STATSIG-CLIENT-TIME': Date.now() + '',
-        'STATSIG-SDK-TYPE': statsigMetadata.sdkType,
-        'STATSIG-SDK-VERSION': statsigMetadata.sdkVersion,
-      },
+      cache: 'reload',
+      headers: isDownloadConfigSpecs
+        ? {}
+        : {
+            'Content-type': 'application/json; charset=UTF-8',
+            'STATSIG-API-KEY': this._identity._sdkKey,
+            'STATSIG-CLIENT-TIME': Date.now() + '',
+            'STATSIG-SDK-TYPE': statsigMetadata.sdkType,
+            'STATSIG-SDK-VERSION': statsigMetadata.sdkVersion,
+          },
     };
 
     if (this.canUseKeepalive && useKeepalive) {
@@ -153,6 +157,7 @@ export default class StatsigNetwork {
           }
           return Promise.resolve(networkResponse);
         }
+
         if (!this.retryCodes[res.status]) {
           retries = 0;
         }
@@ -339,9 +344,7 @@ export default class StatsigNetwork {
     }
   }
 
-  private getUrl(
-    endpointName: StatsigEndpoint,
-  ): string {
+  private getUrl(endpointName: StatsigEndpoint): string {
     if ([StatsigEndpoint.DownloadConfigSpecs].includes(endpointName)) {
       // If this is overridden, dont modify the url, use it as is
       if (this._options.configSpecAPI !== DEFAULT_CONFIG_SPEC_API) {
