@@ -273,7 +273,7 @@ export default class StatsigLogger {
 
     const processor = this;
     this._network
-      .postToEndpoint(
+      .requestToEndpoint(
         StatsigEndpoint.Rgstr,
         {
           events: oldQueue,
@@ -352,7 +352,7 @@ export default class StatsigLogger {
           Array.isArray(requestBody.events)
         ) {
           this._network
-            .postToEndpoint(StatsigEndpoint.Rgstr, requestBody)
+            .requestToEndpoint(StatsigEndpoint.Rgstr, requestBody)
             .then((response) => {
               if (!response.ok) {
                 throw Error(response.status + '');

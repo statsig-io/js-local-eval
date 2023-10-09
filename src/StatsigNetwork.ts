@@ -86,7 +86,7 @@ export default class StatsigNetwork {
     return navigator.sendBeacon(url.toString(), stringPayload);
   }
 
-  public async postToEndpoint(
+  public async requestToEndpoint(
     endpointName: StatsigEndpoint,
     body: object | null,
     retries: number = 0,
@@ -126,20 +126,23 @@ export default class StatsigNetwork {
 
     const statsigMetadata = this._identity._statsigMetadata;
 
-    const params: RequestInit = {
-      method: isDownloadConfigSpecs ? 'GET' : 'POST',
-      body: body === null ? undefined : JSON.stringify(body),
-      cache: 'reload',
-      headers: isDownloadConfigSpecs
-        ? {}
-        : {
+    const params: RequestInit = isDownloadConfigSpecs
+      ? {
+          method: 'GET',
+          body: body === null ? undefined : JSON.stringify(body),
+          cache: 'reload',
+        }
+      : {
+          method: 'POST',
+          body: body === null ? undefined : JSON.stringify(body),
+          headers: {
             'Content-type': 'application/json; charset=UTF-8',
             'STATSIG-API-KEY': this._identity._sdkKey,
             'STATSIG-CLIENT-TIME': Date.now() + '',
             'STATSIG-SDK-TYPE': statsigMetadata.sdkType,
             'STATSIG-SDK-VERSION': statsigMetadata.sdkVersion,
           },
-    };
+        };
 
     if (this.canUseKeepalive && useKeepalive) {
       params.keepalive = true;
@@ -169,7 +172,7 @@ export default class StatsigNetwork {
           return new Promise<NetworkResponse>((resolve, reject) => {
             setTimeout(() => {
               this.leakyBucket[url] = Math.max(this.leakyBucket[url] - 1, 0);
-              this.postToEndpoint(
+              this.requestToEndpoint(
                 endpointName,
                 body,
                 retries - 1,
@@ -236,7 +239,7 @@ export default class StatsigNetwork {
       });
     }
 
-    const fetchPromise = this.postToEndpoint(
+    const fetchPromise = this.requestToEndpoint(
       endpointName,
       body,
       retries,
