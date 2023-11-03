@@ -6,6 +6,7 @@ import { version as SDKVersion } from './SDKVersion';
 export type StatsigMetadata = {
   sdkType: string;
   sdkVersion: string;
+  sessionID: string;
   locale?: string;
   appVersion?: string;
   systemVersion?: string;
@@ -37,15 +38,13 @@ export default class Identity {
     this._statsigMetadata = {
       sdkType: this._sdkType,
       sdkVersion: this._sdkVersion,
+      sessionID: this._getUUID(),
     };
   }
 
   public saveStableID(): void {
     if (this._stableID != null) {
-      StatsigLocalStorage.setItem(
-        STATSIG_STABLE_ID_KEY,
-        this._stableID,
-      );
+      StatsigLocalStorage.setItem(STATSIG_STABLE_ID_KEY, this._stableID);
     }
   }
 
