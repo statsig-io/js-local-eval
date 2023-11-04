@@ -73,6 +73,7 @@ export default class ErrorBoundary {
             'STATSIG-API-KEY': this._sdkKey,
             'STATSIG-SDK-TYPE': String(metadata['sdkType']),
             'STATSIG-SDK-VERSION': String(metadata['sdkVersion']),
+            'STATSIG-SESSION-ID': String(metadata['sessionID']),
             'Content-Type': 'application/json',
             'Content-Length': `${body.length}`,
           },

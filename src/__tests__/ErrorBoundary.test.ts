@@ -1,7 +1,5 @@
 import ErrorBoundary, { ExceptionEndpoint } from '../ErrorBoundary';
-import {
-  StatsigUnsupportedEvaluationError,
-} from '../Errors';
+import { StatsigUnsupportedEvaluationError } from '../Errors';
 
 type ErrorBoundaryRequest = {
   url: string;
@@ -138,7 +136,11 @@ describe('ErrorBoundary', () => {
   });
 
   it('logs statsig metadata', () => {
-    const metadata = { sdkType: 'js-client', sdkVersion: '1.2.3' };
+    const metadata = {
+      sdkType: 'js-client',
+      sdkVersion: '1.2.3',
+      sessionID: 'a-session-id',
+    };
     boundary._setStatsigMetadata(metadata);
 
     boundary._swallow('', () => {
@@ -155,6 +157,7 @@ describe('ErrorBoundary', () => {
       expect.objectContaining({
         'STATSIG-SDK-TYPE': 'js-client',
         'STATSIG-SDK-VERSION': '1.2.3',
+        'STATSIG-SESSION-ID': 'a-session-id',
       }),
     );
   });

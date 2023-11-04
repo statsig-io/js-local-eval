@@ -141,6 +141,7 @@ export default class StatsigNetwork {
             'STATSIG-CLIENT-TIME': Date.now() + '',
             'STATSIG-SDK-TYPE': statsigMetadata.sdkType,
             'STATSIG-SDK-VERSION': statsigMetadata.sdkVersion,
+            'STATSIG-SESSION-ID': statsigMetadata.sessionID,
           },
         };
 
