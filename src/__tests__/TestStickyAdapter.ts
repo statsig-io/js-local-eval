@@ -1,7 +1,7 @@
 import { UserPersistentStorageInterface } from "../StatsigSDKOptions";
 
 export default class TestStickyAdapter implements UserPersistentStorageInterface {
-  public store: Record<string, unknown> = {};
+  public store: Record<string, string> = {};
   load(key: string): string {
     return this.store[key] as string;
   }

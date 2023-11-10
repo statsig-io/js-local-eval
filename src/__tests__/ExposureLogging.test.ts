@@ -3,7 +3,7 @@
  */
 
 import Statsig from '..';
-import * as TestData from './basic_config_spec.json';
+import * as TestData from './data/basic_config_spec.json';
 
 describe('ExposureLogging', () => {
   let events: {
@@ -23,10 +23,7 @@ describe('ExposureLogging', () => {
 
       return Promise.resolve({
         ok: true,
-        text: () =>
-          Promise.resolve(
-            JSON.stringify(TestData),
-          ),
+        text: () => Promise.resolve(JSON.stringify(TestData)),
       });
     });
 
@@ -34,10 +31,7 @@ describe('ExposureLogging', () => {
 
     // @ts-ignore
     Statsig.instance = null;
-    await Statsig.initializeAsync(
-      'client-key',
-      { initTimeoutMs: 1 },
-    );
+    await Statsig.initializeAsync('client-key', { initTimeoutMs: 1 });
 
     // @ts-ignore
     Statsig.instance._options.loggingBufferMaxSize = 1;
@@ -74,7 +68,7 @@ describe('ExposureLogging', () => {
 
     it('logs layer exposures', async () => {
       const layer = Statsig.getLayer({}, 'layer');
-      layer.get('a_string', "default");
+      layer.get('a_string', 'default');
       expect(events.length).toBe(1);
       expect(events[0].metadata.config).toEqual('layer');
       expect(events[0].metadata.isManualExposure).toBeUndefined();

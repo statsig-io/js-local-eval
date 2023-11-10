@@ -19,13 +19,15 @@ describe('StickyValuesStorage', () => {
   const idType = 'userID';
   const storageKey = 'user123:userID';
   const userStickyValues = {
-    value: 'testValue',
-    rule_id: 'testRuleID',
-    json_value: {"key": "value"},
-    secondary_exposures: [],
-    is_experiment_group: true,
-    group_name: 'testGroupName',
-    time: 12345,
+    example_experiment: {
+      value: 'testValue',
+      rule_id: 'testRuleID',
+      json_value: { key: 'value' },
+      secondary_exposures: [],
+      is_experiment_group: true,
+      group_name: 'testGroupName',
+      time: 12345,
+    },
   };
 
   beforeEach(() => {
@@ -57,7 +59,9 @@ describe('StickyValuesStorage', () => {
       expect(mockLoad).toHaveBeenCalledWith(storageKey);
       expect(result).toEqual(userStickyValues);
       // @ts-ignore
-      expect(StickyValuesStorage.inMemoryCache[storageKey]).toEqual(userStickyValues);
+      expect(StickyValuesStorage.inMemoryCache[storageKey]).toEqual(
+        userStickyValues,
+      );
     });
   });
 
@@ -82,7 +86,9 @@ describe('StickyValuesStorage', () => {
       expect(mockLoadAsync).toHaveBeenCalledWith(storageKey);
       expect(result).toEqual(userStickyValues);
       // @ts-ignore
-      expect(StickyValuesStorage.inMemoryCache[storageKey]).toEqual(userStickyValues);
+      expect(StickyValuesStorage.inMemoryCache[storageKey]).toEqual(
+        userStickyValues,
+      );
     });
   });
 
@@ -95,8 +101,10 @@ describe('StickyValuesStorage', () => {
 
     it('saves value to persistent storage', () => {
       StickyValuesStorage.save(user, idType, userStickyValues);
-      expect(mockSave).toHaveBeenCalledWith(storageKey, JSON.stringify(userStickyValues));
+      expect(mockSave).toHaveBeenCalledWith(
+        storageKey,
+        JSON.stringify(userStickyValues),
+      );
     });
   });
 });
-

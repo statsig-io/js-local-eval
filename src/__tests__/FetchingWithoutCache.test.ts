@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import Statsig from '..';
-import * as TestData from './basic_config_spec.json';
+import * as TestData from './data/basic_config_spec.json';
 
 describe('Fetch Without Cache', () => {
   let request: { input: RequestInfo | URL; init?: RequestInit } | null = null;
