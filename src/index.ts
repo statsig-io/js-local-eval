@@ -1,16 +1,27 @@
 import DynamicConfig from './DynamicConfig';
 import Layer from './Layer';
-import StatsigClient, { CheckGateOptions, GetExperimentOptions, GetLayerOptions, InitializeResult } from './StatsigClient';
+import StatsigClient, {
+  CheckGateOptions,
+  GetExperimentOptions,
+  GetLayerOptions,
+  InitializeResult,
+} from './StatsigClient';
 import { SynchronousStatsigOptions, StatsigOptions } from './StatsigSDKOptions';
 import { EvaluationDetails, EvaluationReason } from './EvaluationMetadata';
 import { StatsigUser } from './StatsigUser';
+import { UserPersistedValues } from './utils/StickyValuesStorage';
 
 export { default as DynamicConfig } from './DynamicConfig';
 export { StatsigEnvironment, StatsigOptions } from './StatsigSDKOptions';
 export { EvaluationReason } from './EvaluationMetadata';
 export type { EvaluationDetails } from './EvaluationMetadata';
 export { StatsigUser } from './StatsigUser';
-export type { CheckGateOptions, GetExperimentOptions, GetLayerOptions, InitializeResult };
+export type {
+  CheckGateOptions,
+  GetExperimentOptions,
+  GetLayerOptions,
+  InitializeResult,
+};
 
 export default class Statsig {
   private static instance: StatsigClient | null = null;
@@ -59,10 +70,16 @@ export default class Statsig {
     user: StatsigUser,
     configName: string,
   ): DynamicConfig {
-    return Statsig.instance?.getConfig(user, configName) ?? new DynamicConfig(configName, {}, '', this.getEvaluationDetails());
+    return (
+      Statsig.instance?.getConfig(user, configName) ??
+      new DynamicConfig(configName, {}, '', this.getEvaluationDetails())
+    );
   }
 
-  public static manuallyLogConfigExposure(user: StatsigUser, configName: string) {
+  public static manuallyLogConfigExposure(
+    user: StatsigUser,
+    configName: string,
+  ) {
     Statsig.instance?.logConfigExposure(user, configName);
   }
 
@@ -72,34 +89,45 @@ export default class Statsig {
     experimentName: string,
     options?: GetExperimentOptions,
   ): DynamicConfig {
-    return Statsig.instance?.getExperiment(user, experimentName, options) ?? new DynamicConfig(experimentName, {}, '', this.getEvaluationDetails());
+    return (
+      Statsig.instance?.getExperiment(user, experimentName, options) ??
+      new DynamicConfig(experimentName, {}, '', this.getEvaluationDetails())
+    );
   }
 
-  public static manuallyLogExperimentExposure(user: StatsigUser,configName: string) {
+  public static manuallyLogExperimentExposure(
+    user: StatsigUser,
+    configName: string,
+  ) {
     Statsig.instance?.logExperimentExposure(user, configName);
   }
 
   public static loadUserPersistedValues(
     user: StatsigUser,
     idType: string,
-  ): Record<string, unknown> | null {
-    return Statsig.instance?.loadUserPersistedValues(user, idType) ?? null;
+  ): UserPersistedValues {
+    return Statsig.instance?.loadUserPersistedValues(user, idType) ?? {};
   }
 
   public static async loadUserPersistedValuesAsync(
     user: StatsigUser,
     idType: string,
-  ): Promise<Record<string, unknown> | null> {
-    return await Statsig.instance?.loadUserPersistedValuesAsync(user, idType) ?? null;
+  ): Promise<UserPersistedValues> {
+    return (
+      (await Statsig.instance?.loadUserPersistedValuesAsync(user, idType)) ?? {}
+    );
   }
-  
+
   // Layer
   public static getLayer(
     user: StatsigUser,
     layerName: string,
     options?: GetLayerOptions,
   ): Layer {
-    return Statsig.instance?.getLayer(user, layerName, options) ?? Layer._create(user, layerName, {}, '', this.getEvaluationDetails());
+    return (
+      Statsig.instance?.getLayer(user, layerName, options) ??
+      Layer._create(user, layerName, {}, '', this.getEvaluationDetails())
+    );
   }
 
   public static manuallyLogLayerParameterExposure(

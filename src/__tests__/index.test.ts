@@ -6,7 +6,7 @@ import Statsig from '..';
 import makeLogEvent from '../LogEvent';
 import { EvaluationReason } from '../EvaluationMetadata';
 import { INTERNAL_STORE_KEY } from '../utils/Constants';
-import * as TestData from './basic_config_spec.json';
+import * as TestData from './data/basic_config_spec.json';
 let statsig: typeof Statsig;
 
 export type StatsigInitializeResponse = {

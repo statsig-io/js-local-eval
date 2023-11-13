@@ -11,7 +11,9 @@ import StatsigLocalStorage from './utils/StatsigLocalStorage';
 import makeLogEvent from './LogEvent';
 import ConfigEvaluation from './ConfigEvaluation';
 import Evaluator from './Evaluator';
-import StickyValuesStorage from './utils/StickyValuesStorage';
+import StickyValuesStorage, {
+  UserPersistedValues,
+} from './utils/StickyValuesStorage';
 
 export type CheckGateOptions = {
   disableExposureLogging: boolean;
@@ -19,7 +21,7 @@ export type CheckGateOptions = {
 
 export type GetExperimentOptions = {
   disableExposureLogging?: boolean;
-  userPersistedValues?: Record<string, unknown> | null;
+  userPersistedValues?: Record<string, Record<string, unknown>> | null;
 };
 
 export type GetLayerOptions = {
@@ -27,9 +29,9 @@ export type GetLayerOptions = {
 };
 
 export type InitializeResult = {
-  success: boolean,
-  message?: string,
-}
+  success: boolean;
+  message?: string;
+};
 
 export default class StatsigClient {
   private _ready: boolean;
@@ -71,7 +73,7 @@ export default class StatsigClient {
       this._errorBoundary,
     );
     this._evaluator = new Evaluator(this._options);
-    
+
     if (this._options.initializeValues != null) {
       this._delayedSetup();
     }
@@ -85,13 +87,19 @@ export default class StatsigClient {
           return this._pendingInitPromise;
         }
         if (this._ready) {
-          return Promise.resolve({success: true, message: "Client is already initialized."});
+          return Promise.resolve({
+            success: true,
+            message: 'Client is already initialized.',
+          });
         }
 
         this._initCalled = true;
 
         if (this._options.localMode) {
-          return Promise.resolve({success: true, message: "Client is in local mode."});
+          return Promise.resolve({
+            success: true,
+            message: 'Client is in local mode.',
+          });
         }
 
         this._pendingInitPromise = this._fetchAndSaveValues(
@@ -106,18 +114,26 @@ export default class StatsigClient {
         this._ready = true;
         this._initCalled = true;
         this._delayedSetup();
-        return Promise.resolve({ success: false, message: "An error occurred while initializing" });
+        return Promise.resolve({
+          success: false,
+          message: 'An error occurred while initializing',
+        });
       },
     );
   }
 
-  public initialize(initializeValues: Record<string, unknown>): InitializeResult {
+  public initialize(
+    initializeValues: Record<string, unknown>,
+  ): InitializeResult {
     return this._errorBoundary._capture<InitializeResult>(
       'initialize',
       () => {
         this._ready = true;
         this._initCalled = true;
-        this._evaluator.setInitializeValues(initializeValues, EvaluationReason.Bootstrap);
+        this._evaluator.setInitializeValues(
+          initializeValues,
+          EvaluationReason.Bootstrap,
+        );
         return {
           success: false,
         };
@@ -125,7 +141,7 @@ export default class StatsigClient {
       () => {
         return {
           success: false,
-          message: "An error occurred while parsing initialize values",
+          message: 'An error occurred while parsing initialize values',
         };
       },
     );
@@ -252,39 +268,51 @@ export default class StatsigClient {
   public loadUserPersistedValues(
     user: StatsigUser,
     idType: string,
-  ): Record<string, unknown> | null {
-    return this._errorBoundary._capture('shutdown', () => {
-      if (this._options.userPersistentStorage == null) {
-        console.error("No user persistent storage set.  loadUserPersistedValues will noop");
-        return null;
-      }
-      const persistedValue = StickyValuesStorage.getAll(user, idType);
-      if (persistedValue == null) {
+  ): UserPersistedValues | null {
+    return this._errorBoundary._capture(
+      'shutdown',
+      () => {
+        if (this._options.userPersistentStorage == null) {
+          console.error(
+            'No user persistent storage set.  loadUserPersistedValues will noop',
+          );
+          return null;
+        }
+        const persistedValue = StickyValuesStorage.getAll(user, idType);
+        if (persistedValue == null) {
+          return {};
+        }
+        return persistedValue;
+      },
+      () => {
         return {};
-      }
-      return persistedValue;
-    }, () => {
-      return {};
-    });
+      },
+    );
   }
 
   public async loadUserPersistedValuesAsync(
     user: StatsigUser,
     idType: string,
-  ): Promise<Record<string, unknown> | null> {
-    return this._errorBoundary._capture('shutdown', async () => {
-      if (this._options.userPersistentStorage == null) {
-        console.error("No user persistent storage set.  loadUserPersistedValuesAsync will noop");
-        return null;
-      }
-      const asyncValue = await StickyValuesStorage.getAsync(user, idType);
-      if (asyncValue == null) {
+  ): Promise<UserPersistedValues | null> {
+    return this._errorBoundary._capture(
+      'shutdown',
+      async () => {
+        if (this._options.userPersistentStorage == null) {
+          console.error(
+            'No user persistent storage set.  loadUserPersistedValuesAsync will noop',
+          );
+          return null;
+        }
+        const asyncValue = await StickyValuesStorage.getAsync(user, idType);
+        if (asyncValue == null) {
+          return {};
+        }
+        return asyncValue;
+      },
+      async () => {
         return {};
-      }
-      return asyncValue;
-    }, async () => {
-      return {};
-    });
+      },
+    );
   }
 
   /**

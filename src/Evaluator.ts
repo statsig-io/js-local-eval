@@ -30,7 +30,11 @@ export default class Evaluator {
     return this.store.getDynamicConfig(configName);
   }
 
-  public getConfig(user: StatsigUser, configName: string, options?: GetExperimentOptions): ConfigEvaluation {
+  public getConfig(
+    user: StatsigUser,
+    configName: string,
+    options?: GetExperimentOptions,
+  ): ConfigEvaluation {
     const config = this.store.getDynamicConfig(configName);
     if (config === null) {
       return new ConfigEvaluation(false, '').withEvaluationDetails(
@@ -38,34 +42,32 @@ export default class Evaluator {
         this.store.getLastUpdateTime(),
       );
     }
-    let userStickyValues: Record<string, unknown> | null = options?.userPersistedValues ?? null;
-    // opt in to sticky by providing the values to the check
-    const applyStickyValues = userStickyValues !== null;
-    if (config.isActive  && applyStickyValues) {
-      if (userStickyValues !== null) {
-        const stickyConfig: Record<string, unknown> | null = userStickyValues[configName] as Record<string, unknown> ?? null;
-        if (stickyConfig != null) {
-          const stickyEvaluation = ConfigEvaluation.fromSticky(stickyConfig);
-          if (stickyEvaluation !== null) {
-            return stickyEvaluation;
-          }
-        }
-      }
-    }
 
-    const evaluation = this.evalConfigSpec(user, config);
-    // If the experiment is active and the user is in an experiment group
-    // Save the sticky value if the sdk implementation passes a storage adapter
-    if (config.isActive && evaluation.is_experiment_group && this.options.userPersistentStorage) {
-      if (config.isActive) {
-        if (userStickyValues == null) {
-          userStickyValues = {};
-        }
-        userStickyValues[configName] = evaluation.getJSONValue();
-        if (applyStickyValues) {
-          StickyValuesStorage.save(user, config.idType, userStickyValues);
-        }
+    let evaluation: ConfigEvaluation;
+    let userPersistedValues = options?.userPersistedValues;
+    // If persisted values is provided and the experiment is active, return sticky values if exists.
+    if (config.isActive && userPersistedValues != null) {
+      const stickyConfig = userPersistedValues[configName];
+      const stickyEvaluation = stickyConfig
+        ? ConfigEvaluation.fromSticky(stickyConfig)
+        : null;
+      if (stickyEvaluation !== null) {
+        return stickyEvaluation;
       }
+
+      // If it doesn't exist and the user is in an experiment group, then save to persisted storage.
+      evaluation = this.evalConfigSpec(user, config);
+      if (evaluation.is_experiment_group) {
+        if (userPersistedValues == null) {
+          userPersistedValues = {};
+        }
+        userPersistedValues[configName] = evaluation.getJSONValue();
+        StickyValuesStorage.save(user, config.idType, userPersistedValues);
+      }
+      // Otherwise remove the sticky values from persistent storage
+    } else {
+      StickyValuesStorage.delete(user, config.idType, configName);
+      evaluation = this.evalConfigSpec(user, config);
     }
     return evaluation;
   }
@@ -96,7 +98,10 @@ export default class Evaluator {
     return this.store.getGlobalEvaluationDetails();
   }
 
-  public setInitializeValues(initializeValues: Record<string, unknown>, reason: EvaluationReason): void {
+  public setInitializeValues(
+    initializeValues: Record<string, unknown>,
+    reason: EvaluationReason,
+  ): void {
     this.store.setInitializeValues(initializeValues, reason);
   }
 
@@ -218,13 +223,13 @@ export default class Evaluator {
     rule: ConfigRule,
     config: ConfigSpec,
   ): {
-    value: boolean,
-    hash: string,
+    value: boolean;
+    hash: string;
   } {
     if (rule.passPercentage === 100) {
-      return {value: true, hash: '0'};
+      return { value: true, hash: '0' };
     } else if (rule.passPercentage === 0) {
-      return {value: false, hash: '0'};
+      return { value: false, hash: '0' };
     }
     const hash = computeUserHash(
       config.salt +
@@ -234,12 +239,12 @@ export default class Evaluator {
         (EvaluationUtils.getUnitID(user, rule.idType) ?? ''),
     );
     return {
-      value: Number(hash % BigInt(CONDITION_SEGMENT_COUNT)) < rule.passPercentage * 100,
+      value:
+        Number(hash % BigInt(CONDITION_SEGMENT_COUNT)) <
+        rule.passPercentage * 100,
       hash: String(hash),
     };
   }
-
-
 
   private _evalRule(user: StatsigUser, rule: ConfigRule) {
     let secondaryExposures: Record<string, string>[] = [];
@@ -280,10 +285,7 @@ export default class Evaluator {
       case 'fail_gate':
       case 'pass_gate': {
         const nestedGate = this.store.getFeatureGate(target as string);
-        const gateResult = this.evalConfigSpec(
-          user,
-          nestedGate,
-        );
+        const gateResult = this.evalConfigSpec(user, nestedGate);
         value = gateResult?.value;
 
         const allExposures = gateResult?.secondary_exposures ?? [];

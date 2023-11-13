@@ -4,7 +4,7 @@
 
 import Statsig from '../index';
 import { EvaluationReason } from '../EvaluationMetadata';
-import * as TestData from './basic_config_spec.json';
+import * as TestData from './data/basic_config_spec.json';
 
 type Indexable = {
   [key: string]: (_arg0: string, _arg1: any) => any;
