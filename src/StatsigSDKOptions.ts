@@ -1,3 +1,5 @@
+import { UserPersistedValues } from "./utils/StickyValuesStorage";
+
 export const DEFAULT_CONFIG_SPEC_API = 'https://api.statsigcdn.com/v1/download_config_specs/';
 export const DEFAULT_EVENT_LOGGING_API = 'https://events.statsigapi.net/v1/rgstr';
 export const INIT_TIMEOUT_DEFAULT_MS = 3000;
@@ -8,9 +10,9 @@ export type StatsigEnvironment = {
 };
 
 export interface UserPersistentStorageInterface {
-  load(key: string): string
-  save(key: string, data: string): void
-  loadAsync(key: string): Promise<string>
+  load(key: string): UserPersistedValues
+  save(key: string, experiment: string, data: string | null): void
+  loadAsync(key: string): Promise<UserPersistedValues>
 }
 
 type CommonOptions = {

@@ -98,8 +98,9 @@ describe('Verify e2e behavior of UserPersistedValues functions', () => {
     expect(exp?._ruleID).toStrictEqual(UnallocatedResult.ruleID);
 
     // At this point, we have not opted in to sticky
-    expect(Object.keys(stickyAdapter.store).length).toEqual(0);
     expect(setSpy).toHaveBeenCalledTimes(0);
+    expect(Object.keys(stickyAdapter.store).length).toEqual(0);
+    
 
     // Control group with persisted storage enabled
     // (should save to storage, but evaluate as normal until next call)
@@ -223,11 +224,12 @@ describe('Verify e2e behavior of UserPersistedValues functions', () => {
     expect(exp?._evaluationDetails.reason).toStrictEqual(
       EvaluationReason.Bootstrap,
     );
+    const allocated = stickyAdapter.store['vj:userID'];
     expect(
-      JSON.parse(stickyAdapter.store['vj:userID'])['the_allocated_experiment'],
+      allocated,
     ).not.toBeUndefined();
     expect(
-      JSON.parse(stickyAdapter.store['vj:userID'])[
+      allocated[
         'another_allocated_experiment_still_active'
       ],
     ).not.toBeUndefined();
@@ -245,10 +247,10 @@ describe('Verify e2e behavior of UserPersistedValues functions', () => {
       EvaluationReason.Bootstrap,
     );
     expect(
-      JSON.parse(stickyAdapter.store['vj:userID'])['the_allocated_experiment'],
+      stickyAdapter.store['vj:userID']['the_allocated_experiment'],
     ).toBeUndefined();
     expect(
-      JSON.parse(stickyAdapter.store['vj:userID'])[
+      stickyAdapter.store['vj:userID'][
         'another_allocated_experiment_still_active'
       ],
     ).not.toBeUndefined();
@@ -262,7 +264,7 @@ describe('Verify e2e behavior of UserPersistedValues functions', () => {
       EvaluationReason.Bootstrap,
     );
     expect(
-      JSON.parse(stickyAdapter.store['hunter2:userID'])[
+      stickyAdapter.store['hunter2:userID'][
         'the_allocated_experiment'
       ],
     ).toBeUndefined();
