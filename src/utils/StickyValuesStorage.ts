@@ -60,14 +60,14 @@ export default class StickyValuesStorage {
     user: StatsigUser,
     idType: string,
     experimentName: string,
-    userStickyValues: Record<string, unknown> | null,
+    userStickyValues: Record<string, unknown>,
   ): void {
     if (this.storageInterface == null) {
       return;
     }
     const key = this.getStorageKey(user, idType);
     try {
-      const value = userStickyValues == null ? null : JSON.stringify(userStickyValues);
+      const value = JSON.stringify(userStickyValues);
       this.storageInterface.save(key, experimentName, value);
     } catch (e) {
       console.debug(`Failed to save key (${key}) to user persisted storage`, e);
@@ -81,7 +81,8 @@ export default class StickyValuesStorage {
     const persistedValue = StickyValuesStorage.getAll(user, idType);
     if (persistedValue != null) {
       delete persistedValue[configName];
-      StickyValuesStorage.save(user, idType, configName, null);
+      const key = this.getStorageKey(user, idType);
+      this.storageInterface.delete(key, configName);
     }
   }
 

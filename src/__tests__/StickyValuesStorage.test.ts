@@ -31,7 +31,7 @@ describe('StickyValuesStorage', () => {
   };
 
   beforeEach(() => {
-    StickyValuesStorage.storageInterface = mockStorageInterface;
+    (StickyValuesStorage as any).storageInterface = mockStorageInterface;
     mockLoad.mockClear();
     mockSave.mockClear();
     mockLoadAsync.mockClear();
@@ -95,15 +95,25 @@ describe('StickyValuesStorage', () => {
   describe('save', () => {
     it('does nothing if storageInterface is null', () => {
       StickyValuesStorage.storageInterface = null;
-      StickyValuesStorage.save(user, idType, "example_experiment", userStickyValues.example_experiment);
+      StickyValuesStorage.save(
+        user,
+        idType,
+        'example_experiment',
+        userStickyValues.example_experiment,
+      );
       expect(mockSave).not.toHaveBeenCalled();
     });
 
     it('saves value to persistent storage', () => {
-      StickyValuesStorage.save(user, idType, "example_experiment", userStickyValues.example_experiment);
+      StickyValuesStorage.save(
+        user,
+        idType,
+        'example_experiment',
+        userStickyValues.example_experiment,
+      );
       expect(mockSave).toHaveBeenCalledWith(
         storageKey,
-        "example_experiment",
+        'example_experiment',
         JSON.stringify(userStickyValues.example_experiment),
       );
     });

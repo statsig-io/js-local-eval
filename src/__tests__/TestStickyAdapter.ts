@@ -4,16 +4,16 @@ import { UserPersistedValues } from "../utils/StickyValuesStorage";
 export default class TestStickyAdapter implements UserPersistentStorageInterface {
   public store: Record<string, UserPersistedValues> = {};
 
+  delete(key: string, experimentName: string): void {
+    delete this.store[key][experimentName];
+  }
+
   load(key: string): UserPersistedValues {
     return this.store[key];
   }
 
-  save(key: string, experimentName: string, data: string | null): void {
+  save(key: string, experimentName: string, data: string): void {
     let updatedValue: UserPersistedValues = this.store[key];
-    if (data == null) {
-      delete updatedValue[experimentName];
-      return;
-    }
     if (updatedValue == null) {
       updatedValue = {};
     }
