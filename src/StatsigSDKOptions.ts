@@ -10,8 +10,9 @@ export type StatsigEnvironment = {
 };
 
 export interface UserPersistentStorageInterface {
+  delete(key: string, experiment: string): void
   load(key: string): UserPersistedValues
-  save(key: string, experiment: string, data: string | null): void
+  save(key: string, experiment: string, data: string): void
   loadAsync(key: string): Promise<UserPersistedValues>
 }
 
