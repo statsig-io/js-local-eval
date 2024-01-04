@@ -58,14 +58,10 @@ export default class Evaluator {
       // If it doesn't exist and the user is in an experiment group, then save to persisted storage.
       evaluation = this.evalConfigSpec(user, config);
       if (evaluation.is_experiment_group) {
-        if (userPersistedValues == null) {
-          userPersistedValues = {};
-        }
-        userPersistedValues[configName] = evaluation.getJSONValue();
-        StickyValuesStorage.save(user, config.idType, userPersistedValues);
+        StickyValuesStorage.save(user, config.idType, config.name, evaluation.getJSONValue());
       }
-      // Otherwise remove the sticky values from persistent storage
     } else {
+      // Remove the sticky values from persistent storage if the config is no longer active
       StickyValuesStorage.delete(user, config.idType, configName);
       evaluation = this.evalConfigSpec(user, config);
     }

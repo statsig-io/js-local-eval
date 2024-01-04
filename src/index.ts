@@ -21,6 +21,7 @@ export type {
   GetExperimentOptions,
   GetLayerOptions,
   InitializeResult,
+  UserPersistedValues,
 };
 
 export default class Statsig {
