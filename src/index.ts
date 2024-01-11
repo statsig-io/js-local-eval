@@ -12,7 +12,11 @@ import { StatsigUser } from './StatsigUser';
 import { UserPersistedValues } from './utils/StickyValuesStorage';
 
 export { default as DynamicConfig } from './DynamicConfig';
-export { StatsigEnvironment, StatsigOptions } from './StatsigSDKOptions';
+export {
+  StatsigEnvironment,
+  StatsigOptions,
+  UserPersistentStorageInterface,
+} from './StatsigSDKOptions';
 export { EvaluationReason } from './EvaluationMetadata';
 export type { EvaluationDetails } from './EvaluationMetadata';
 export { StatsigUser } from './StatsigUser';
