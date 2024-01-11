@@ -12,6 +12,7 @@ export default class DynamicConfig {
 
   readonly _name: string;
   readonly _ruleID: string;
+  readonly _groupName: string | null;
   readonly _secondaryExposures: Record<string, string>[];
   readonly _evaluationDetails: EvaluationDetails;
   readonly _onDefaultValueFallback: OnDefaultValueFallback | null = null;
@@ -20,6 +21,7 @@ export default class DynamicConfig {
     configName: string,
     configValue: Record<string, any>,
     ruleID: string,
+    groupName: string | null,
     evaluationDetails: EvaluationDetails,
     secondaryExposures: Record<string, string>[] = [],
     onDefaultValueFallback: OnDefaultValueFallback | null = null,
@@ -28,6 +30,7 @@ export default class DynamicConfig {
 
     this._name = configName;
     this._ruleID = ruleID ?? '';
+    this._groupName = groupName;
     this._secondaryExposures = secondaryExposures;
     this._evaluationDetails = evaluationDetails;
     this._onDefaultValueFallback = onDefaultValueFallback;
@@ -78,5 +81,9 @@ export default class DynamicConfig {
       return defaultValue;
     }
     return this.value[key];
+  }
+
+  public getGroupName(): string | null {
+    return this._groupName;
   }
 }
