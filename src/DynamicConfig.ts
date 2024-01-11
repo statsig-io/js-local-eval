@@ -30,7 +30,7 @@ export default class DynamicConfig {
 
     this._name = configName;
     this._ruleID = ruleID ?? '';
-    this._groupName = groupName;
+    this._groupName = groupName ?? null;
     this._secondaryExposures = secondaryExposures;
     this._evaluationDetails = evaluationDetails;
     this._onDefaultValueFallback = onDefaultValueFallback;
