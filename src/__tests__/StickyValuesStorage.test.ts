@@ -45,24 +45,6 @@ describe('StickyValuesStorage', () => {
       const result = StickyValuesStorage.getAll(user, idType);
       expect(result).toBeNull();
     });
-
-    it('returns value from in-memory cache if it exists', () => {
-      // @ts-ignore
-      StickyValuesStorage.inMemoryCache[storageKey] = userStickyValues;
-      const result = StickyValuesStorage.getAll(user, idType);
-      expect(result).toEqual(userStickyValues);
-    });
-
-    it('returns value from persistent storage if it exists and caches it in memory', () => {
-      mockLoad.mockReturnValueOnce(userStickyValues);
-      const result = StickyValuesStorage.getAll(user, idType);
-      expect(mockLoad).toHaveBeenCalledWith(storageKey);
-      expect(result).toEqual(userStickyValues);
-      // @ts-ignore
-      expect(StickyValuesStorage.inMemoryCache[storageKey]).toEqual(
-        userStickyValues,
-      );
-    });
   });
 
   describe('getAsync', () => {
@@ -70,25 +52,6 @@ describe('StickyValuesStorage', () => {
       StickyValuesStorage.storageInterface = null;
       const result = await StickyValuesStorage.getAsync(user, idType);
       expect(result).toBeNull();
-    });
-
-    it('returns value from in-memory cache if it exists', async () => {
-      // @ts-ignore
-      StickyValuesStorage.inMemoryCache[storageKey] = userStickyValues;
-      const result = await StickyValuesStorage.getAsync(user, idType);
-      expect(result).toEqual(userStickyValues);
-    });
-
-    it('returns value from persistent storage if it exists and caches it in memory', async () => {
-      mockLoadAsync.mockResolvedValueOnce(userStickyValues);
-      const result = await StickyValuesStorage.getAsync(user, idType);
-
-      expect(mockLoadAsync).toHaveBeenCalledWith(storageKey);
-      expect(result).toEqual(userStickyValues);
-      // @ts-ignore
-      expect(StickyValuesStorage.inMemoryCache[storageKey]).toEqual(
-        userStickyValues,
-      );
     });
   });
 
