@@ -7,8 +7,6 @@ export type UserPersistedValues = Record<string, Record<string, unknown>>;
 export default class StickyValuesStorage {
   public static storageInterface: UserPersistentStorageInterface | null = null;
 
-  private static inMemoryCache: Record<string, UserPersistedValues> = {};
-
   public static getAll(
     user: StatsigUser,
     idType: string,
@@ -16,19 +14,17 @@ export default class StickyValuesStorage {
     if (this.storageInterface === null) {
       return null;
     }
+
     const key = this.getStorageKey(user, idType);
-    if (this.inMemoryCache[key] != null) {
-      return this.inMemoryCache[key];
-    }
     try {
-      const storageValue = this.storageInterface.load(key);
-      return this.parsePersistedValueAndCacheInMemory(key, storageValue);
+      return this.storageInterface.load(key);
     } catch (e) {
       console.debug(
         `Failed to load key (${key}) from user persisted storage`,
         e,
       );
     }
+
     return null;
   }
 
@@ -39,20 +35,17 @@ export default class StickyValuesStorage {
     if (this.storageInterface == null) {
       return null;
     }
-    const key = this.getStorageKey(user, idType);
-    if (this.inMemoryCache[key] != null) {
-      return this.inMemoryCache[key];
-    }
 
+    const key = this.getStorageKey(user, idType);
     try {
-      const storageValue = await this.storageInterface.loadAsync(key);
-      return this.parsePersistedValueAndCacheInMemory(key, storageValue);
+      return await this.storageInterface.loadAsync(key);
     } catch (e) {
       console.debug(
         `Failed to loadAsync key (${key}) from user persisted storage`,
         e,
       );
     }
+
     return null;
   }
 
@@ -65,6 +58,7 @@ export default class StickyValuesStorage {
     if (this.storageInterface == null) {
       return;
     }
+
     const key = this.getStorageKey(user, idType);
     try {
       const value = JSON.stringify(userStickyValues);
@@ -78,24 +72,13 @@ export default class StickyValuesStorage {
     if (this.storageInterface == null) {
       return;
     }
+
     const persistedValue = StickyValuesStorage.getAll(user, idType);
     if (persistedValue != null) {
       delete persistedValue[configName];
       const key = this.getStorageKey(user, idType);
       this.storageInterface.delete(key, configName);
     }
-  }
-
-  private static parsePersistedValueAndCacheInMemory(
-    key: string,
-    storageValue: UserPersistedValues,
-  ): UserPersistedValues | null {
-    if (storageValue == null) {
-      return null;
-    }
-
-    this.inMemoryCache[key] = storageValue;
-    return storageValue;
   }
 
   private static getStorageKey(user: StatsigUser, idType: string): string {
