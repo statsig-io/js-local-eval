@@ -77,7 +77,7 @@ export default class Statsig {
   ): DynamicConfig {
     return (
       Statsig.instance?.getConfig(user, configName) ??
-      new DynamicConfig(configName, {}, '', this.getEvaluationDetails())
+      new DynamicConfig(configName, {}, '', null, this.getEvaluationDetails())
     );
   }
 
@@ -96,7 +96,7 @@ export default class Statsig {
   ): DynamicConfig {
     return (
       Statsig.instance?.getExperiment(user, experimentName, options) ??
-      new DynamicConfig(experimentName, {}, '', this.getEvaluationDetails())
+      new DynamicConfig(experimentName, {}, '', null, this.getEvaluationDetails())
     );
   }
 

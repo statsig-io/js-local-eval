@@ -20,6 +20,7 @@ describe('Verify behavior of DynamicConfig', () => {
       nullKey: null,
     },
     'default',
+    null,
     {
       reason: EvaluationReason.Network,
       time: Date.now(),
@@ -31,7 +32,7 @@ describe('Verify behavior of DynamicConfig', () => {
   });
 
   test('Test constructor', () => {
-    const config = new DynamicConfig('name', { test: 123 }, 'default', {
+    const config = new DynamicConfig('name', { test: 123 }, 'default', null, {
       reason: EvaluationReason.Network,
       time: Date.now(),
     });
@@ -84,6 +85,10 @@ describe('Verify behavior of DynamicConfig', () => {
     expect(testConfig.get<string[]>('bool', [])).toStrictEqual([]);
   });
 
+  test('Group Name', () => {
+    expect(testConfig.getGroupName()).toBeNull();
+  });
+
   test('Test objects', () => {
     expect(testConfig.getValue('object')).toStrictEqual({
       key: 'value',
@@ -114,7 +119,7 @@ describe('Verify behavior of DynamicConfig', () => {
   });
 
   test('Behavior of dummy configs', () => {
-    const dummyConfig = new DynamicConfig('configName', {}, '', {
+    const dummyConfig = new DynamicConfig('configName', {}, '', 'Test', {
       reason: EvaluationReason.Uninitialized,
       time: Date.now(),
     });
@@ -137,5 +142,7 @@ describe('Verify behavior of DynamicConfig', () => {
     expect(dummyConfig.getValue('obj', { key: 'value' })).toEqual({
       key: 'value',
     });
+
+    expect(dummyConfig.getGroupName()).toEqual('Test');
   });
 });

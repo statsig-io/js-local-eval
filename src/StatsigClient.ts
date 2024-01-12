@@ -455,6 +455,7 @@ export default class StatsigClient {
       configName,
       evaluation.json_value,
       evaluation.rule_id,
+      evaluation.group_name,
       evaluation.evaluation_details,
       evaluation.secondary_exposures,
       this._makeOnConfigDefaultValueFallback(user),
@@ -577,6 +578,7 @@ export default class StatsigClient {
       configName,
       {},
       '',
+      null,
       this._getEvaluationDetailsForError(),
     );
   }

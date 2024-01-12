@@ -58,6 +58,7 @@ describe('Verify behavior of DynamicConfig', () => {
       arr: [1, 2, 'three'],
     },
     'default',
+    null,
     {
       reason: EvaluationReason.Network,
       time: Date.now(),
