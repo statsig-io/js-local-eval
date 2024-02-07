@@ -135,7 +135,7 @@ export default class StatsigClient {
           EvaluationReason.Bootstrap,
         );
         return {
-          success: false,
+          success: true,
         };
       },
       () => {
