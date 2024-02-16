@@ -160,7 +160,7 @@ export default class Evaluator {
             ruleResult.config_delegate,
           );
           evaluation.setIsExperimentGroup(ruleResult.is_experiment_group);
-          return evaluation.withGroupName(ruleResult.group_name);
+          return evaluation.withGroupName(rule.groupName);
         }
       }
     } catch (e: unknown) {
@@ -262,7 +262,6 @@ export default class Evaluator {
       secondaryExposures,
       rule.returnValue as Record<string, unknown>,
     );
-    evaluation.withGroupName(rule.groupName);
     evaluation.setIsExperimentGroup(rule.isExperimentGroup ?? false);
     return evaluation;
   }
