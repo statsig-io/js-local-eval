@@ -299,23 +299,10 @@ export default class Evaluator {
       }
       case 'ip_based':
         value = getFromUser(user, field);
-        if (value == null) {
-          // this would apply to things like 'country'
-          // if inferred from ip
-          throw new StatsigUnsupportedEvaluationError(
-            'Unsupported condition: ' + condition.type,
-          );
-        }
-        
+        break;
       case 'ua_based':
         value = getFromUser(user, field);
-        if (value == null) {
-          // this would apply to things like 'os', 'browser'
-          // if inferred from ua
-          throw new StatsigUnsupportedEvaluationError(
-            'Unsupported condition: ' + condition.type,
-          );
-        }
+        break;
       case 'user_field':
         value = getFromUser(user, field);
         break;
