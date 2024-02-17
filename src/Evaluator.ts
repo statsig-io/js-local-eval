@@ -298,15 +298,11 @@ export default class Evaluator {
         };
       }
       case 'ip_based':
-        // this would apply to things like 'country', 'region', etc.
-        throw new StatsigUnsupportedEvaluationError(
-          'Unsupported condition: ' + condition.type,
-        );
+        value = getFromUser(user, field);
+        break;
       case 'ua_based':
-        // this would apply to things like 'os', 'browser', etc.
-        throw new StatsigUnsupportedEvaluationError(
-          'Unsupported condition: ' + condition.type,
-        );
+        value = getFromUser(user, field);
+        break;
       case 'user_field':
         value = getFromUser(user, field);
         break;
