@@ -21,7 +21,7 @@ export type CheckGateOptions = {
 
 export type GetExperimentOptions = {
   disableExposureLogging?: boolean;
-  userPersistedValues?: Record<string, Record<string, unknown>> | null;
+  userPersistedValues?: UserPersistedValues | null;
 };
 
 export type GetLayerOptions = {

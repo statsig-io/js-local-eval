@@ -20,11 +20,10 @@ describe('StickyValuesStorage', () => {
   const storageKey = 'user123:userID';
   const userStickyValues = {
     example_experiment: {
-      value: 'testValue',
+      value: true,
       rule_id: 'testRuleID',
       json_value: { key: 'value' },
       secondary_exposures: [],
-      is_experiment_group: true,
       group_name: 'testGroupName',
       time: 12345,
     },

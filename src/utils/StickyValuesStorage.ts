@@ -2,7 +2,18 @@ import { UserPersistentStorageInterface } from '../StatsigSDKOptions';
 import { StatsigUser } from '../StatsigUser';
 import EvaluationUtils from './EvaluationUtils';
 
-export type UserPersistedValues = Record<string, Record<string, unknown>>;
+// The properties of this struct must fit a universal schema that
+// when JSON-ified, can be parsed by every SDK supporting user persistent evaluation.
+export type StickyValues = {
+  value: boolean;
+  rule_id: string;
+  json_value: Record<string, unknown>;
+  secondary_exposures: Record<string, string>[];
+  group_name: string | null;
+  time: number;
+};
+
+export type UserPersistedValues = Record<string, StickyValues>;
 
 export default class StickyValuesStorage {
   public static storageInterface: UserPersistentStorageInterface | null = null;
@@ -53,7 +64,7 @@ export default class StickyValuesStorage {
     user: StatsigUser,
     idType: string,
     experimentName: string,
-    userStickyValues: Record<string, unknown>,
+    userStickyValues: StickyValues,
   ): void {
     if (this.storageInterface == null) {
       return;
