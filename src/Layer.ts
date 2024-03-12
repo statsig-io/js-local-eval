@@ -17,6 +17,7 @@ export default class Layer {
   readonly _explicitParameters: string[];
   readonly _evaluationDetails: EvaluationDetails;
   readonly _logParameterFunction: LogParameterFunction | null;
+  readonly _groupName: string | null;
 
   private constructor(
     user: StatsigUser,
@@ -29,6 +30,7 @@ export default class Layer {
     undelegatedSecondaryExposures: Record<string, string>[] = [],
     allocatedExperimentName: string | null = null,
     explicitParameters: string[] = [],
+    groupName: string | null = null,
   ) {
     this._user = user;
     this._logParameterFunction = logParameterFunction;
@@ -40,6 +42,7 @@ export default class Layer {
     this._undelegatedSecondaryExposures = undelegatedSecondaryExposures;
     this._allocatedExperimentName = allocatedExperimentName;
     this._explicitParameters = explicitParameters;
+    this._groupName = groupName;
   }
 
   static _create(
@@ -53,6 +56,7 @@ export default class Layer {
     undelegatedSecondaryExposures: Record<string, string>[] = [],
     allocatedExperimentName: string | null = null,
     explicitParameters: string[] = [],
+    groupName: string | null = null,
   ): Layer {
     return new Layer(
       user,
@@ -65,6 +69,7 @@ export default class Layer {
       undelegatedSecondaryExposures,
       allocatedExperimentName,
       explicitParameters,
+      groupName,
     );
   }
 
@@ -77,8 +82,7 @@ export default class Layer {
     const val = this._value[key];
 
     if (val == null) {
-
-    // @ts-ignore
+      // @ts-ignore
       return def;
     }
 
@@ -88,8 +92,7 @@ export default class Layer {
     };
 
     if (typeGuard) {
-
-    // @ts-ignore
+      // @ts-ignore
       return typeGuard(val) ? logAndReturn() : def;
     }
 

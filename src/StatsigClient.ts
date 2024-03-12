@@ -544,6 +544,7 @@ export default class StatsigClient {
       result.undelegated_secondary_exposures,
       result.config_delegate,
       result.explicit_parameters ?? [],
+      result.group_name ?? null,
     );
   }
 
