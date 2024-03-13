@@ -1,5 +1,6 @@
 import { EvaluationReason } from './EvaluationMetadata';
 import type { EvaluationDetails } from './EvaluationMetadata';
+import type { StickyValues } from './utils/StickyValuesStorage';
 
 export default class ConfigEvaluation {
   public value: boolean;
@@ -58,27 +59,26 @@ export default class ConfigEvaluation {
     this.is_experiment_group = isExperimentGroup;
   }
 
-  public static fromSticky(stickyValue: Record<string, unknown>): ConfigEvaluation | null {
+  public static fromSticky(stickyValue: StickyValues): ConfigEvaluation | null {
     const evaluation = new ConfigEvaluation(
-      stickyValue.value as boolean,
-      stickyValue.rule_id as string,
-      stickyValue.secondary_exposures as Record<string, string>[],
-      stickyValue.json_value as Record<string, unknown>,
+      stickyValue.value,
+      stickyValue.rule_id,
+      stickyValue.secondary_exposures,
+      stickyValue.json_value,
     );
     evaluation.evaluation_details = {
-      time: stickyValue.time as number,
+      time: stickyValue.time,
       reason: EvaluationReason.Persisted,
     };
-    return evaluation.withGroupName(stickyValue.group_name as string);
+    return evaluation.withGroupName(stickyValue.group_name);
   }
 
-  public getJSONValue(): Record<string, unknown> {
+  public getJSONValue(): StickyValues {
     return {
       value: this.value,
       rule_id: this.rule_id,
       json_value: this.json_value,
       secondary_exposures: this.secondary_exposures,
-      is_experiment_group: this.is_experiment_group,
       group_name: this.group_name,
       time: this.evaluation_details.time,
     };
