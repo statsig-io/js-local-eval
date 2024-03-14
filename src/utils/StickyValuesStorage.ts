@@ -9,6 +9,9 @@ export type StickyValues = {
   rule_id: string;
   json_value: Record<string, unknown>;
   secondary_exposures: Record<string, string>[];
+  explicit_parameters: string[] | null;
+  config_delegate: string | null;
+  undelegated_secondary_exposures: Record<string, string>[];
   group_name: string | null;
   time: number;
 };

@@ -2,12 +2,14 @@ import ConfigEvaluation from './ConfigEvaluation';
 import { ConfigCondition, ConfigRule, ConfigSpec } from './ConfigSpec';
 import { StatsigUnsupportedEvaluationError } from './Errors';
 import { EvaluationDetails, EvaluationReason } from './EvaluationMetadata';
-import { GetExperimentOptions } from './StatsigClient';
+import { GetExperimentOptions, GetLayerOptions } from './StatsigClient';
 import StatsigSDKOptions from './StatsigSDKOptions';
 import StatsigStore from './StatsigStore';
 import { StatsigUser } from './StatsigUser';
 import EvaluationUtils from './utils/EvaluationUtils';
-import StickyValuesStorage from './utils/StickyValuesStorage';
+import StickyValuesStorage, {
+  UserPersistedValues,
+} from './utils/StickyValuesStorage';
 import { sha256 } from 'js-sha256';
 
 const CONDITION_SEGMENT_COUNT = 10 * 1000;
@@ -43,29 +45,11 @@ export default class Evaluator {
       );
     }
 
-    let evaluation: ConfigEvaluation;
-    let userPersistedValues = options?.userPersistedValues;
-    // If persisted values is provided and the experiment is active, return sticky values if exists.
-    if (config.isActive && userPersistedValues != null) {
-      const stickyConfig = userPersistedValues[configName];
-      const stickyEvaluation = stickyConfig
-        ? ConfigEvaluation.fromSticky(stickyConfig)
-        : null;
-      if (stickyEvaluation !== null) {
-        return stickyEvaluation;
-      }
-
-      // If it doesn't exist and the user is in an experiment group, then save to persisted storage.
-      evaluation = this.evalConfigSpec(user, config);
-      if (evaluation.is_experiment_group) {
-        StickyValuesStorage.save(user, config.idType, config.name, evaluation.getJSONValue());
-      }
-    } else {
-      // Remove the sticky values from persistent storage if the config is no longer active
-      StickyValuesStorage.delete(user, config.idType, configName);
-      evaluation = this.evalConfigSpec(user, config);
-    }
-    return evaluation;
+    return this.evalConfigWithPersistedValues(
+      user,
+      config,
+      options?.userPersistedValues,
+    );
   }
 
   public checkGate(user: StatsigUser, gateName: string): ConfigEvaluation {
@@ -79,7 +63,11 @@ export default class Evaluator {
     return this.evalConfigSpec(user, config);
   }
 
-  public getLayer(user: StatsigUser, layerName: string): ConfigEvaluation {
+  public getLayer(
+    user: StatsigUser,
+    layerName: string,
+    options?: GetLayerOptions,
+  ): ConfigEvaluation {
     const layer = this.store.getLayerConfig(layerName);
     if (layer === null) {
       return new ConfigEvaluation(false, '').withEvaluationDetails(
@@ -87,7 +75,11 @@ export default class Evaluator {
         this.store.getLastUpdateTime(),
       );
     }
-    return this.evalConfigSpec(user, layer);
+    return this.evalLayerWithPersistedValues(
+      user,
+      layer,
+      options?.userPersistedValues,
+    );
   }
 
   public getGlobalEvaluationDetails(): EvaluationDetails {
@@ -116,6 +108,105 @@ export default class Evaluator {
       this.store.getGlobalEvaluationDetails().reason,
       this.store.getLastUpdateTime(),
     );
+  }
+
+  private evalAndSaveToPersistentStorage(
+    user: StatsigUser,
+    config: ConfigSpec,
+  ): ConfigEvaluation {
+    const evaluation = this.evalConfigSpec(user, config);
+    if (evaluation.is_experiment_group) {
+      StickyValuesStorage.save(
+        user,
+        config.idType,
+        config.name,
+        evaluation.getJSONValue(),
+      );
+    }
+    return evaluation;
+  }
+
+  private evalAndDeleteFromPersistentStorage(
+    user: StatsigUser,
+    config: ConfigSpec,
+  ): ConfigEvaluation {
+    StickyValuesStorage.delete(user, config.idType, config.name);
+    return this.evalConfigSpec(user, config);
+  }
+
+  private evalLayerWithPersistedValues(
+    user: StatsigUser,
+    layer: ConfigSpec,
+    userPersistedValues?: UserPersistedValues | null,
+  ): ConfigEvaluation {
+    if (userPersistedValues == null) {
+      // Remove the sticky values from persistent storage if user persisted values is not provided
+      return this.evalAndDeleteFromPersistentStorage(user, layer);
+    }
+
+    const stickyConfig = userPersistedValues[layer.name];
+    const stickyEvaluation = stickyConfig
+      ? ConfigEvaluation.fromSticky(stickyConfig)
+      : null;
+
+    if (stickyEvaluation !== null) {
+      if (this.allocatedExperimentExistsAndIsActive(stickyEvaluation)) {
+        // Return sticky evaluation if experiment exists and is active
+        return stickyEvaluation;
+      } else {
+        // Remove the sticky values from persistent storage if the allocated experiment no longer exists or is no longer active
+        return this.evalAndDeleteFromPersistentStorage(user, layer);
+      }
+    } else {
+      const evaluation = this.evalConfigSpec(user, layer);
+      if (this.allocatedExperimentExistsAndIsActive(evaluation)) {
+        if (evaluation.is_experiment_group) {
+          // If it doesn't exist and the user is in an experiment group, then save to persisted storage.
+          StickyValuesStorage.save(
+            user,
+            layer.idType,
+            layer.name,
+            evaluation.getJSONValue(),
+          );
+        }
+      } else {
+        // Remove the sticky values from persistent storage if the allocated experiment no longer exists or is no longer active
+        StickyValuesStorage.delete(user, layer.idType, layer.name);
+      }
+      return evaluation;
+    }
+  }
+
+  private allocatedExperimentExistsAndIsActive(
+    evaluation: ConfigEvaluation,
+  ): boolean {
+    const delegate = evaluation.config_delegate
+      ? this.store.getDynamicConfig(evaluation.config_delegate)
+      : null;
+    return delegate != null && delegate.isActive == true;
+  }
+
+  private evalConfigWithPersistedValues(
+    user: StatsigUser,
+    config: ConfigSpec,
+    userPersistedValues?: UserPersistedValues | null,
+  ): ConfigEvaluation {
+    if (!config.isActive || userPersistedValues == null) {
+      // Remove the sticky values from persistent storage if experiment is not active or user persisted values is not provided
+      return this.evalAndDeleteFromPersistentStorage(user, config);
+    }
+
+    const stickyConfig = userPersistedValues[config.name];
+    const stickyEvaluation = stickyConfig
+      ? ConfigEvaluation.fromSticky(stickyConfig)
+      : null;
+
+    if (stickyEvaluation !== null) {
+      return stickyEvaluation;
+    }
+
+    // If it doesn't exist and the user is in an experiment group, then save to persisted storage.
+    return this.evalAndSaveToPersistentStorage(user, config);
   }
 
   private _eval(user: StatsigUser, config: ConfigSpec): ConfigEvaluation {

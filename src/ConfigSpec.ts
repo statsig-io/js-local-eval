@@ -20,7 +20,9 @@ export class ConfigSpec {
     this.idType = specJSON.idType as string;
     this.rules = this.parseRules(specJSON.rules);
     this.entity = specJSON.entity as string;
-    this.explicitParameters = specJSON.explicitParameters as string[];
+    this.explicitParameters = (specJSON.explicitParameters ?? null) as
+      | string[]
+      | null;
     if (specJSON.isActive !== null) {
       this.isActive = specJSON.isActive as boolean;
     }
@@ -40,7 +42,6 @@ export class ConfigSpec {
     return rules;
   }
 
-
   toRecord(): Record<string, unknown> {
     return {
       name: this.name,
@@ -49,7 +50,7 @@ export class ConfigSpec {
       defaultValue: this.defaultValue,
       enabled: this.enabled,
       idType: this.idType,
-      rules: this.rules.map(rule => rule.toRecord()),
+      rules: this.rules.map((rule) => rule.toRecord()),
       entity: this.entity,
       explicitParameters: this.explicitParameters,
       hasSharedParams: this.hasSharedParams,
@@ -83,21 +84,21 @@ export class ConfigRule {
     if (ruleJSON.isExperimentGroup !== null) {
       this.isExperimentGroup = ruleJSON.isExperimentGroup as boolean;
     }
-    this.groupName = ruleJSON.groupName as string ?? null;
+    this.groupName = (ruleJSON.groupName as string) ?? null;
   }
 
   toRecord(): Record<string, unknown> {
     return {
       name: this.name,
       passPercentage: this.passPercentage,
-      conditions: this.conditions.map(condition => condition.toRecord()),
+      conditions: this.conditions.map((condition) => condition.toRecord()),
       returnValue: this.returnValue,
       id: this.id,
       salt: this.salt,
       idType: this.idType,
       configDelegate: this.configDelegate,
       isExperimentGroup: this.isExperimentGroup,
-      groupName: this.groupName
+      groupName: this.groupName,
     };
   }
 
@@ -136,7 +137,7 @@ export class ConfigCondition {
       operator: this.operator,
       field: this.field,
       additionalValues: this.additionalValues,
-      idType: this.idType
+      idType: this.idType,
     };
   }
 }

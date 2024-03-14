@@ -9,7 +9,7 @@ export default class ConfigEvaluation {
   public json_value: Record<string, unknown>;
   public explicit_parameters: string[] | null;
   public config_delegate: string | null;
-  public undelegated_secondary_exposures: Record<string, string>[] | undefined;
+  public undelegated_secondary_exposures: Record<string, string>[];
   public is_experiment_group: boolean;
   public group_name: string | null = null;
   public evaluation_details: EvaluationDetails;
@@ -65,11 +65,16 @@ export default class ConfigEvaluation {
       stickyValue.rule_id,
       stickyValue.secondary_exposures,
       stickyValue.json_value,
+      stickyValue.explicit_parameters,
+      stickyValue.config_delegate,
     );
     evaluation.evaluation_details = {
       time: stickyValue.time,
       reason: EvaluationReason.Persisted,
     };
+    evaluation.undelegated_secondary_exposures =
+      stickyValue.undelegated_secondary_exposures;
+    evaluation.is_experiment_group = true;
     return evaluation.withGroupName(stickyValue.group_name);
   }
 
@@ -79,6 +84,10 @@ export default class ConfigEvaluation {
       rule_id: this.rule_id,
       json_value: this.json_value,
       secondary_exposures: this.secondary_exposures,
+      explicit_parameters: this.explicit_parameters,
+      config_delegate: this.config_delegate,
+      undelegated_secondary_exposures:
+        this.undelegated_secondary_exposures ?? null,
       group_name: this.group_name,
       time: this.evaluation_details.time,
     };
