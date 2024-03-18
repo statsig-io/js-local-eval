@@ -25,7 +25,8 @@ export type GetExperimentOptions = {
 };
 
 export type GetLayerOptions = {
-  disableExposureLogging: boolean;
+  disableExposureLogging?: boolean;
+  userPersistedValues?: UserPersistedValues | null;
 };
 
 export type InitializeResult = {
@@ -514,7 +515,7 @@ export default class StatsigClient {
         const logFunc = options?.disableExposureLogging
           ? null
           : this._logLayerParameterExposureForLayer;
-        return this._getLayerEvaluation(user, logFunc, layerName);
+        return this._getLayerEvaluation(user, logFunc, layerName, options);
       },
       () =>
         Layer._create(
@@ -531,8 +532,9 @@ export default class StatsigClient {
     user: StatsigUser,
     logParameterFunction: LogParameterFunction | null,
     layerName: string,
+    options?: GetLayerOptions,
   ): Layer {
-    const result = this._evaluator.getLayer(user, layerName);
+    const result = this._evaluator.getLayer(user, layerName, options);
     return Layer._create(
       user,
       layerName,
