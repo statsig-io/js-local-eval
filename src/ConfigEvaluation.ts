@@ -59,7 +59,7 @@ export default class ConfigEvaluation {
     this.is_experiment_group = isExperimentGroup;
   }
 
-  public static fromSticky(stickyValue: StickyValues): ConfigEvaluation | null {
+  public static fromSticky(stickyValue: StickyValues): ConfigEvaluation {
     const evaluation = new ConfigEvaluation(
       stickyValue.value,
       stickyValue.rule_id,
